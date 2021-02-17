@@ -1,0 +1,665 @@
+﻿@model Scheduler01.ViewModels.SchedulerViewModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<script>
+    var cellHeight;
+
+    var formatTime = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "numeric" }).format;
+    var doctorsData =@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Doctors));
+    var roomsData =@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Rooms));
+    var statusData =@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.StatusList));
+
+    function getSchedulerInstance() {
+        return $("#scheduler").dxScheduler("instance");
+    }
+
+    function getDoctorById(id) {
+        return DevExpress.data.query(doctorsData)
+            .filter("DoctorId", id)
+            .toArray()[0];
+    }
+
+    function getRoomById(id) {
+        return DevExpress.data.query(roomsData)
+            .filter("RoomId", id)
+            .toArray()[0];
+    }
+
+    function getStatusById(id) {
+        return DevExpress.data.query(statusData)
+            .filter("StatusId", id)
+            .toArray()[0];
+    }
+
+    function appointmentForm_created(data) {
+    console.log(data);
+        var viewType = data.component._currentView.name;
+
+        var form = data.form,
+            doctor = getDoctorById(data.appointmentData.DoctorId) || {},
+            startDate = data.appointmentData.Date;
+        var popup = data.popup;
+   
+        popup.option({
+            minWidth: "1200px",
+            height:"1000px",
+            showTitle: true,
+            titlTemplate: "title",
+            dragEnabled: true,
+            title: "Create New Appointment",
+            //resizeEnabled: true
+        });
+       
+        form.option("labelLocation", "left");
+        //form.option("colCount", 1);
+        
+        form.option("items", [
+           
+
+            // patient group start
+           {
+                colSpan: 2,
+                itemType: "group",
+                cssClass: "patient-group",
+                items: [
+
+            // patient 2 columns start
+                {
+                itemType: "group",
+                colSpan: 2,
+                colCount: 2,
+                items: [{
+                    itemType: "group",
+                    items: [
+                        {
+                            label: {
+                                text: "Patient ID"
+                            },
+                            height:"10px",
+                            editorType: "dxTextBox",
+                            value: "A123456",
+                            name: "patientid",
+                            mode:"text",
+                        },
+                        {
+                            label: {
+                                text: "Ref ID"
+                            },
+                            height: "10px",
+                            editorType: "dxTextBox",
+                            value: "A123456",
+                            name: "refid",
+                            mode: "text",
+                        },
+                    ]
+                },
+                {
+                    itemType: "group",
+                    items: [
+                        {
+                            label: {
+                                text: "Patient Name"
+                            },
+                            height: "10px",
+                            editorType: "dxTextBox",
+                            value: "A123456",
+                            name: "patientname",
+                            mode: "text",
+                        },
+                        {
+                            label: {
+                                text: "Chinese Name"
+                            },
+                            height: "10px",
+                            editorType: "dxTextBox",
+                            value: "A123456",
+                            name: "chinesename",
+                            mode: "text",
+                        },
+                    ]
+                },
+                ]
+           },
+           // patient 2 columns end
+
+           // patient 3 columns start
+           {
+                itemType: "group",
+                colSpan: 2,
+                colCount: 3,
+                items: [{
+                    itemType: "group",
+                    items: [
+                        {
+                            label: {
+                                text: "Gender"
+                            },
+                            editorType: "dxSelectBox"
+                        },
+                        {
+                            label: {
+                                text: "Phone"
+                            },
+                            editorType: "dxTextBox",
+                            value: "A123456",
+                            name: "mobile",
+                            mode: "text",
+                        }
+                        
+                        
+                    ]
+                },
+                {
+                    itemType: "group",
+                    items: [
+                        {
+                            label: {
+                                text: "DOB"
+                            },
+                            editorType: "dxDateBox",
+                            editorOptions: {
+                                width: "100%",
+                                type: "date",
+                            }
+                        },
+                        {
+                            label: {
+                                text: "Mobile"
+                            },
+                            editorType: "dxTextBox",
+                            value: "A123456",
+                            name: "mobile",
+                            mode: "text",
+                        }
+                    ]
+                    },
+                    {
+                        itemType: "group",
+                        items: [
+                            {
+                                label: {
+                                    text: "Age"
+                                },
+                                editorType: "dxTextBox",
+                                value: "A123456",
+                                name: "age",
+                                mode: "text",
+                            },
+                            {
+                                label: {
+                                    text: "Email"
+                                },
+                                editorType: "dxTextBox",
+                                value: "A123456",
+                                name: "email",
+                                mode: "text",
+                            },
+                        ]
+                    },
+                ]
+           },
+           // patient 3 columns end
+
+           // patient 1 column start
+           {
+                colSpan: 2,
+                label: {
+                    text: "HKID"
+                },
+                editorType: "dxTextBox",
+                value: "A123456",
+                name: "hkid",
+                mode: "text",
+           },
+           {
+                colSpan: 2,
+                label: {
+                   text: "Passport"
+               },
+               editorType: "dxTextBox",
+               value: "A123456",
+               name: "passport",
+               mode: "text",
+           },
+           // patient 1 column end
+           ]},
+           // patient group end
+
+           // appointment info group start
+               {
+                   colSpan: 2,
+                   itemType: "group",
+                   cssClass: "appointment-group",
+                   items: [
+                       // first 3 columns start
+                       {
+                           itemType: "group",
+                           colSpan: 2,
+                           colCount: 3,
+                           items: [{
+                               itemType: "group",
+                               items: [
+                                   {
+                                       label: {
+                                           text: "Dr. Booked"
+                                       },
+                                       editorType: "dxSelectBox"
+                                   },
+                               ]
+                           },
+                           {
+                               itemType: "group",
+                               items: []
+                           },
+                           {
+                               itemType: "group",
+                               items: []
+                           },
+                           ]
+                       },
+                       // first 3 columns end
+
+                       // second 3 columns start
+                       {
+                           itemType: "group",
+                           colSpan: 2,
+                           colCount: 3,
+                           items: [{
+                               itemType: "group",
+                               items: [
+                                   {
+                                       label: {
+                                           text: "Exam Date"
+                                       },
+                                       dataField: "Date",
+                                       editorType: "dxDateBox",
+                                       editorOptions: {
+                                            value: data.appointmentData.startDate,
+                                            width: "100%",
+                                            type: "date",
+                                            onValueChanged: function (args) {
+                                                startDate = args.value;
+                                            }
+                                        }
+                                   },
+                               ]
+                           },
+                           {
+                               itemType: "group",
+                               items: [
+                                   {
+                                       label: {
+                                           text: "Exam Time"
+                                       },
+                                       dataField: "Time",
+                                       editorType: "dxDateBox",
+                                       editorOptions: {
+                                            value: data.appointmentData.startDate,
+                                            width: "100%",
+                                            type: "time",
+                                            interval: 15,
+                                            onValueChanged: function (args) {
+                                                startDate = args.value;;
+                                            }
+                                        }
+                                   }
+
+                               ]
+                           },
+                           {
+                               itemType: "group",
+                               items: [
+                                   {
+                                       label: {
+                                           text: "Duration"
+                                       },
+                                       editorType: "dxSelectBox",
+                                       text: "Minute"
+                                   },
+                               ]
+                           },
+                           ]
+                       },
+                        // second 3 columns end
+                       {
+                           colSpan: 2,
+                           label: {
+                               text: "Remark"
+                           },
+                           editorType: "dxTextBox",
+                           value: "A123456",
+                           name: "passport",
+                           mode: "text",
+                       },
+                       {
+                           colSpan: 2,
+                           label: {
+                               text: "Memo"
+                           },
+                           editorType: "dxTextArea",
+                           value: "A123456",
+                           name: "passport",
+                           mode: "text",
+                       },
+                       {
+                           colSpan: 2,
+                           label: {
+                               text: "Booked For"
+                           },
+                           editorType: "dxSelectBox",
+                           dataField: "DoctorId",
+                           editorOptions: {
+                                dataSource: doctorsData,
+                                searchEnabled: true,
+                                displayExpr: "Name",
+                                valueExpr: "DoctorId",
+                                value: (viewType == "Doctor") ? data.appointmentData.DoctorId : "",
+                                onValueChanged: function (args) {
+                                 
+                                }
+                            },
+                       },
+                       {
+                           colSpan: 2,
+                           label: {
+                               text: "Customer"
+                           },
+                           editorType: "dxTextBox",
+                           value: "A123456",
+                           name: "passport",
+                           mode: "text",
+                       },
+                       {
+                           colSpan: 2,
+                           label: {
+                               text: " "
+                           },
+                           editorType: "dxSelectBox",
+                       },
+
+                       // service product group start
+                       {
+                           itemType: "group",
+                           colSpan: 2,
+                           colCount: 4,
+                           items: [{
+                               itemType: "group",
+                               colSpan: 3,
+                               items: [
+                                   {
+                                       label: {
+                                           text: "Exam Service Pdt"
+                                       },
+                                       editorType: "dxTextBox"
+                                   },
+                               ]
+                           },
+                           {
+                               itemType: "group",
+                               items: [
+                                   {
+                                       dataField: "Ignore Price Column",
+                                       editorType: "dxCheckBox"
+                                   }
+
+                               ]
+                           }
+                           ]
+                       },
+                       // service product group end
+
+                       {
+                           colSpan: 2,
+                           label: {
+                               text: "    "
+                           },
+                           editorType: "dxTextArea",
+                           height: 200,
+                           editorOption: {
+                               
+                           }
+                       },
+
+                       {
+                           colSpan: 2,
+                           label: {
+                               text: "Room"
+                           },
+                           editorType: "dxSelectBox",
+                           dataField: "RoomId",
+                           editorOptions: {
+                                searchEnabled:true,
+                                dataSource: roomsData,
+                                displayExpr: "Name",
+                                valueExpr: "RoomId",
+                                value: (viewType == "Room") ? data.appointmentData.RoomId : "",
+                                onValueChanged: function (args) {
+                                   
+                                }
+                            },
+                       },
+                   ]
+               },
+            // appointment info group end
+
+           // appointment status group start
+               {
+                   colSpan: 2,
+                   itemType: "group",
+                   cssClass: "appointment-status-group",
+                   items: [
+                       // first 3 columns start
+                       {
+                           itemType: "group",
+                           colSpan: 2,
+                           colCount: 3,
+                           items: [{
+                               itemType: "group",
+                               items: [
+                                   {
+                                       label: {
+                                           text: "Attend Date"
+                                       },
+                                       editorType: "dxDateBox"
+                                   },
+                               ]
+                           },
+                           {
+                               itemType: "group",
+                               items: [{
+                                   label: {
+                                       text: "Attend Time"
+                                   },
+                                   editorType: "dxDateBox"
+                               },]
+                           },
+                           {
+                               itemType: "group",
+                               items: [{
+                                   label: {
+                                       text: "Status"
+                                   },
+                                
+                                   editorType: "dxSelectBox",
+                                   popupWidthExtension: 0,
+                                   dropPosition: {
+                                       offset: {
+                                           h: 0, v: 0
+                                       }
+                                   } 
+                               },]
+                           },
+                           ]
+                       },
+                       // first 3 columns end
+                   ]
+               },
+            // appointment status group end
+
+
+           ]);
+        form.beginUpdate();
+        $(".dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable").css("max-width", "100%");
+        form.endUpdate();
+
+    }
+
+    function checkHasAppointment(e) {
+
+        // Cancelled appointment cannot move
+        if (e.oldData.StatusId == 3) {
+            e.cancel = true;
+        }
+
+    }
+
+    function onContentReady(e) {
+        console.log(e.component._currentView.name + " content ready!");
+    }
+
+
+    function formatLabel(value) {
+        return value + "px";
+    }
+
+    function slider_valueChanged(data) {
+        cellHeight = data.value;
+
+        var schedulerInstance = getSchedulerInstance();
+        $(".dx-scheduler-cell-sizes-vertical").css("height", (cellHeight) + "px");
+        $("#scheduler").dxScheduler("getDataSource").reload();
+        $(".dx-item.dx-scheduler-appointment.dx-scheduler-appointment-vertical.dx-resizable").css("min-height", (cellHeight) + "px");
+  
+        var dataGridOptions = $("#scheduler").dxScheduler("option");
+    }
+
+    
+    function renderAppointment(e) {
+        var d = Date.parse(e.appointmentData.Date);
+        var t = Date.parse(e.appointmentData.Time);
+        var diffMin = (t - d) / 1000 / 60 / 15;
+        e.appointmentElement.height(cellHeight * diffMin - 1);
+    }
+
+    function radioGroup_valueChanged(e) {
+        var priorities = e.component.option("items");
+        var dataGridOptions = $("#scheduler").dxScheduler("option");
+    }
+
+</script>
+
+<div class="row">
+    @(Html.DevExtreme().Scheduler()
+        .ID("scheduler")
+        .DataSource(Model.Bookings)
+        .TimeZone("Asia/Hong_Kong")
+
+        .Views(views =>
+        {
+            views.Add()
+                .Name("Doctor")
+                .Type(SchedulerViewType.Day)
+                .GroupOrientation(Orientation.Horizontal)
+                .Groups(new[] { "DoctorId" })
+                .IntervalCount(1);
+            
+
+            views.Add()
+                .Name("Room")
+                .Type(SchedulerViewType.Day)
+                .GroupOrientation(Orientation.Horizontal)
+                .Groups(new[] { "RoomId" })
+                .IntervalCount(1);
+
+            views.Add()
+                .Name("Week")
+                .Type(SchedulerViewType.Week)
+                .IntervalCount(1);
+
+        })
+
+        .CurrentView(SchedulerViewType.Day)
+        .CrossScrollingEnabled(true)
+        .CellDuration(15)
+
+        .CurrentDate(new DateTime(2021, 2, 3))
+        .StartDayHour(9)
+        .Height(800)
+        .EndDayHour(19)
+
+
+        .StartDateExpr("Date")
+        .EndDateExpr("Time")
+        .ShowAllDayPanel(false)
+        .GroupByDate(true)
+
+        .ResourceCellTemplate(@<text>
+                    <div><%- data.Name %></div>
+            </text>)
+        .Resources(res =>
+        {
+
+            res.Add()
+                .FieldExpr("RoomId")
+                .DisplayExpr("RoomId")
+                .ValueExpr("RoomId")
+                .AllowMultiple(false)
+                .Label("RoomId")
+                .DataSource(Model.Rooms);
+
+            res.Add()
+                .FieldExpr("DoctorId")
+                .DisplayExpr("Name")
+                .ValueExpr("DoctorId")
+                .AllowMultiple(false)
+                .Label("DoctorId")
+                .DataSource(Model.Doctors);
+
+            res.Add()
+                .FieldExpr("StatusId")
+                .ValueExpr("StatusId")
+                .AllowMultiple(false)
+                .Label("StatusId")
+                .DisplayExpr("StatusId")
+                .ColorExpr("Color")
+                .UseColorAsDefault(true)
+                .DataSource(Model.StatusList);
+        })
+
+
+        .AppointmentTooltipTemplate(@<text>
+                @(Html.Partial("_AppointmentTooltipTemplate"))
+            </text>)
+
+        .AppointmentTemplate(@<text>
+                @(Html.Partial("_AppointmentTemplate"))
+            </text>)
+
+
+    .OnAppointmentFormOpening("appointmentForm_created")
+    .OnAppointmentRendered("renderAppointment")
+
+
+)
+    @(Html.DevExtreme().Slider()
+            .Width(200)
+            .Step(10)
+            .KeyStep(10)
+            .Max(100)
+            .Min(50)
+            .Label(l => l
+                .Visible(true)
+                .Format(new JS("formatLabel"))
+                .Position(VerticalEdge.Bottom)
+            )
+            .Tooltip(t => t
+                .Enabled(true)
+                .Format(new JS("formatLabel"))
+                .Position(VerticalEdge.Bottom)
+                .ShowMode(SliderTooltipShowMode.OnHover)
+            )
+            .OnValueChanged("slider_valueChanged")
+        )
+</div>
